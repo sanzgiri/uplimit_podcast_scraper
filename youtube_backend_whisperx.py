@@ -13,7 +13,7 @@ def download_whisperX():
   # Perform download only once and save to Container storage
   _ = whisperx.load_model("medium", device, compute_type=compute_type)
 
-stub = modal.Stub("corise-youtube-project")
+stub = modal.Stub("corise-youtube-project-whisperx")
 corise_image = modal.Image.debian_slim().pip_install("yt-dlp",
                                                      "requests",
                                                      "ffmpeg",

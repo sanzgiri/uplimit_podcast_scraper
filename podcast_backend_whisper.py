@@ -10,7 +10,7 @@ def download_whisper():
   whisper._download(whisper._MODELS["medium"], '/content/podcast/', False)
 
 
-stub = modal.Stub("corise-podcast-project")
+stub = modal.Stub("corise-podcast-project-whisper")
 corise_image = modal.Image.debian_slim().pip_install("feedparser",
                                                      "https://github.com/openai/whisper/archive/9f70a352f9f8630ab3aa0d06af5cb9532bd8c21d.tar.gz",
                                                      "requests",
@@ -20,7 +20,7 @@ corise_image = modal.Image.debian_slim().pip_install("feedparser",
                                                      "wikipedia",
                                                      "ffmpeg-python").apt_install("ffmpeg").run_function(download_whisper)
 
-@stub.function(image=corise_image, gpu="any")
+@stub.function(image=corise_image, gpu="any", timeout=1200)
 def get_transcribe_podcast(rss_url, local_path):
   print ("Starting Podcast Transcription Function")
   print ("Feed URL: ", rss_url)
@@ -76,7 +76,7 @@ def get_transcribe_podcast(rss_url, local_path):
   return output
   
 
-@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"))
+@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"), timeout=1200)
 def get_podcast_summary(podcast_transcript):
     import openai
     instructPrompt = """
@@ -91,7 +91,7 @@ def get_podcast_summary(podcast_transcript):
     podcastSummary = chatOutput.choices[0].message.content
     return podcastSummary
 
-@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"))
+@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"), timeout=1200)
 def get_podcast_guest(podcast_transcript):
     import openai
     import wikipedia
@@ -127,7 +127,7 @@ def get_podcast_guest(podcast_transcript):
     print ("Podcast Guest is ", podcast_guest)
     return podcast_guest
 
-@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"))
+@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"), timeout=1200)
 def get_podcast_highlights(podcast_transcript):
     import openai
     instructPrompt = """Extract some highlights from the podcast transcript that follows. These could be interesting insights from the guest or critical questions from the podcast host. It could also be a discussion on a hot topic or a controversial opinion."""

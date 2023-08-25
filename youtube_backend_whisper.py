@@ -10,7 +10,7 @@ def download_whisper():
   whisper._download(whisper._MODELS["medium"], '/content/youtube/', False)
 
 
-stub = modal.Stub("corise-youtube-project")
+stub = modal.Stub("corise-youtube-project-whisper")
 corise_image = modal.Image.debian_slim().pip_install("yt-dlp",
                                                      "https://github.com/openai/whisper/archive/9f70a352f9f8630ab3aa0d06af5cb9532bd8c21d.tar.gz",
                                                      "requests",

@@ -13,7 +13,7 @@ def download_whisperX():
   # Perform download only once and save to Container storage
   _ = whisperx.load_model("medium", device, compute_type=compute_type)
 
-stub = modal.Stub("corise-podcast-project")
+stub = modal.Stub("corise-podcast-project-whisperx", timeout=1200)
 corise_image = modal.Image.debian_slim().pip_install("feedparser",
                                                      "requests",
                                                      "ffmpeg",
@@ -33,7 +33,7 @@ corise_image = corise_image.pip_install("git+https://github.com/m-bain/whisperx.
                                         ).run_function(download_whisperX)
 
 
-@stub.function(image=corise_image, gpu="any", timeout=600)
+@stub.function(image=corise_image, gpu="any", timeout=1200)
 def get_transcribe_podcast(rss_url, local_path):
   print ("Starting Podcast Transcription Function")
   print ("Feed URL: ", rss_url)
@@ -101,7 +101,7 @@ def get_transcribe_podcast(rss_url, local_path):
   output['episode_transcript'] = result['text']
   return output
 
-@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"))
+@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"), timeout=1200)
 def get_podcast_summary(podcast_transcript):
   import openai
   instructPrompt = """
@@ -121,7 +121,7 @@ def get_podcast_summary(podcast_transcript):
   podcastSummary = chatOutput.choices[0].message.content
   return podcastSummary
 
-@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"))
+@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"), timeout=1200)
 def get_podcast_guest(podcast_transcript):
   import openai
   import wikipedia
@@ -204,7 +204,7 @@ def get_podcast_guest(podcast_transcript):
 
   return podcastGuest
 
-@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"))
+@stub.function(image=corise_image, secret=modal.Secret.from_name("my-openai-secret"), timeout=1200)
 def get_podcast_highlights(podcast_transcript):
   import openai
   instructPrompt = """
